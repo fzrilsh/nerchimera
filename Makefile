@@ -36,6 +36,7 @@ ENGINE_ASAN_OPTIONS := halt_on_error=1:detect_leaks=1
 endif
 
 PROXY_BIN := proxy/netchimera
+LAB_BIN   := target-lab/target-lab
 
 todo = @echo "make $@: not implemented yet (see .kiro/specs/netchimera/tasks.md, $(1))" >&2; exit 1
 
@@ -75,8 +76,10 @@ proxy: $(ENGINE_LIB)
 proxy-test: $(ENGINE_LIB)
 	cd proxy && CGO_ENABLED=1 GODEBUG=cgocheck=1 go vet ./... && CGO_ENABLED=1 GODEBUG=cgocheck=1 go test -race ./...
 
-lab:
-	$(call todo,task 9.2)
+lab: $(LAB_BIN)
+
+$(LAB_BIN): $(wildcard target-lab/*.go) target-lab/go.mod
+	cd target-lab && go build -trimpath -o target-lab .
 
 ui:
 	$(call todo,task 14.5)
@@ -91,7 +94,7 @@ test:
 	$(call todo,task 15.3)
 
 simulate:
-	$(call todo,task 11.2)
+	@PROXY_URL=$${PROXY_URL:-http://127.0.0.1:8080} ./scripts/simulate.sh
 
 bench:
 	$(call todo,task 15.4)
@@ -106,4 +109,4 @@ down:
 	$(call todo,task 15.3)
 
 clean:
-	rm -rf $(ENGINE_BUILD) $(PROXY_BIN)
+	rm -rf $(ENGINE_BUILD) $(PROXY_BIN) $(LAB_BIN)

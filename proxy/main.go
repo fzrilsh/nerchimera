@@ -86,7 +86,7 @@ func run() int {
 
 	proxySrv := &http.Server{Handler: proxy, ReadHeaderTimeout: readHeaderTimeout, IdleTimeout: idleTimeout}
 	apiSrv := &http.Server{
-		Handler:           NewAPIHandler(hub, status, NewSimulator()),
+		Handler:           NewAPIHandler(hub, status, NewSimulator(cfg.ProxyAddr, hub)),
 		ReadHeaderTimeout: readHeaderTimeout,
 		IdleTimeout:       idleTimeout,
 	}

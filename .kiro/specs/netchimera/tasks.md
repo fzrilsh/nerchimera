@@ -80,33 +80,33 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
 - [x] 8. Checkpoint: engine + bridge + proxy
   - Run the proxy against a throwaway upstream (or the lab, once task 9 exists), connect with `websocat ws://127.0.0.1:8081/ws -H 'Origin: http://localhost:3000'`, send a few `curl -x` and reverse requests, and confirm `TRANSACTION_EVENT`, `ENGINE_TELEMETRY`, and `SYSTEM_STATUS` messages. Run `go test ./...` if test tasks were done.
 
-- [ ] 9. Target lab
-  - [ ] 9.1 Initialize `target-lab/go.mod` (stdlib only), add it to `go.work`, and implement `target-lab/main.go` with every route and handler name from the design table, startup secret generation (`crypto/rand`, base62), `AKIAIOSFODNN7EXAMPLE`, a localhost default bind, and the red vulnerability banner
+- [x] 9. Target lab
+  - [x] 9.1 Initialize `target-lab/go.mod` (stdlib only), add it to `go.work`, and implement `target-lab/main.go` with every route and handler name from the design table, startup secret generation (`crypto/rand`, base62), `AKIAIOSFODNN7EXAMPLE`, a localhost default bind, and the red vulnerability banner
     - _Requirements: 20.1, 20.2, 20.3, 20.4, 20.5, 20.6, 20.7_
-  - [ ] 9.2 Fill in the Makefile `lab` target
+  - [x] 9.2 Fill in the Makefile `lab` target
     - _Requirements: 21.1_
-  - [ ] 9.3 Verify via the proxy with `curl` that each vulnerable route raises its expected flag and both control routes raise none
+  - [x] 9.3 Verify via the proxy with `curl` that each vulnerable route raises its expected flag and both control routes raise none
     - _Requirements: 3.5, 20.5_
 
-- [ ] 10. AI agent and mock generator
-  - [ ] 10.1 Implement `proxy/mock.go`: deterministic templates for all six classifications in the shared section format, with diffs anchored to the `target-lab/main.go` handlers and a generic middleware diff for other hosts, plus Nginx and Cloudflare rules; add a chunked streaming helper (48 bytes, 12 ms)
+- [x] 10. AI agent and mock generator
+  - [x] 10.1 Implement `proxy/mock.go`: deterministic templates for all six classifications in the shared section format, with diffs anchored to the `target-lab/main.go` handlers and a generic middleware diff for other hosts, plus Nginx and Cloudflare rules; add a chunked streaming helper (48 bytes, 12 ms)
     - _Requirements: 13.1, 13.5, 21.5_
-  - [ ] 10.2 Implement the prompt builder in `proxy/agent.go`: system prompt with untrusted-data instructions, delimited user block with redacted Header Block, ≤ 8 KiB redacted body, scores, Findings, and classification hint
+  - [x] 10.2 Implement the prompt builder in `proxy/agent.go`: system prompt with untrusted-data instructions, delimited user block with redacted Header Block, ≤ 8 KiB redacted body, scores, Findings, and classification hint
     - _Requirements: 14.1, 14.2, 14.4_
-  - [ ] 10.3 Implement the live client: `chat/completions` with `stream: true`, SSE parsing (1 MiB scanner, `[DONE]`), 50 ms delta coalescing into `AI_PATCH_STREAM`, `AI_TIMEOUT` context, and key-safe error reporting
+  - [x] 10.3 Implement the live client: `chat/completions` with `stream: true`, SSE parsing (1 MiB scanner, `[DONE]`), 50 ms delta coalescing into `AI_PATCH_STREAM`, `AI_TIMEOUT` context, and key-safe error reporting
     - _Requirements: 12.3, 12.5, 13.2_
-  - [ ] 10.4 Implement the section parser and diff validation, `Advisory` assembly, `AI_PATCH_EVENT` publishing, mock fallback with `source: "fallback"`, AI status/processed counters, and `AI_WORKERS` consumers of `aiQueue`; replace the stub from 7.3
+  - [x] 10.4 Implement the section parser and diff validation, `Advisory` assembly, `AI_PATCH_EVENT` publishing, mock fallback with `source: "fallback"`, AI status/processed counters, and `AI_WORKERS` consumers of `aiQueue`; replace the stub from 7.3
     - _Requirements: 12.2, 12.4, 13.1, 13.3, 13.4, 14.3_
   - [ ]* 10.5 Write `agent_test.go`: SSE parser edge cases with an `httptest` fake provider, fallback on 500/timeout, parser on missing sections, mock determinism (property 13), and `git apply --check` of mock diffs against a temp copy of `target-lab/`
     - _Requirements: 12.4, 13.4, 13.5_
 
-- [ ] 11. Attack simulator
-  - [ ] 11.1 Implement `proxy/simulate.go`: `POST /api/simulate` with the fixed scenario table from the design, run asynchronously through the proxy listener with 150 ms pacing, `202` response, 5 s rate limit with `429` and `Retry-After`; replace the stub from 7.3
+- [x] 11. Attack simulator
+  - [x] 11.1 Implement `proxy/simulate.go`: `POST /api/simulate` with the fixed scenario table from the design, run asynchronously through the proxy listener with 150 ms pacing, `202` response, 5 s rate limit with `429` and `Retry-After`; replace the stub from 7.3
     - _Requirements: 19.2, 19.3, 19.4_
-  - [ ] 11.2 Write `scripts/simulate.sh` mirroring the scenarios with `curl`, and fill in the Makefile `simulate` target
+  - [x] 11.2 Write `scripts/simulate.sh` mirroring the scenarios with `curl`, and fill in the Makefile `simulate` target
     - _Requirements: 19.5_
 
-- [ ] 12. Checkpoint: backend complete
+- [x] 12. Checkpoint: backend complete
   - With `make lab` and `make proxy` running and no env vars set, run `make simulate` and confirm via `websocat` that `AI_PATCH_STREAM` and `AI_PATCH_EVENT` (mock source) arrive for the WCD, credential leak, and session fixation scenarios, and that the controls produce no advisories.
 
 - [ ] 13. UI foundation
