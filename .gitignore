@@ -1,0 +1,21 @@
+# Engine build output
+engine/build/
+
+# Go binaries
+proxy/netchimera
+target-lab/target-lab
+
+# UI
+ui/node_modules/
+ui/.next/
+ui/out/
+ui/next-env.d.ts
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor noise
+.DS_Store
+*.swp

@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "CGO Safety Check",
+      "trigger": "PostFileSave",
+      "description": "After saving an engine C++ file or a proxy Go file, review it against the CGO memory contract and Go concurrency rules in .kiro/steering/security-rules.md.",
+      "matcher": "(engine/.*\\.(cpp|h)|proxy/.*\\.go)$",
+      "action": {
+        "type": "agent",
+        "prompt": "A NetChimera engine or proxy file was just saved. Review the saved file against .kiro/steering/security-rules.md and report violations with file:line and a concrete fix. Do not rewrite unrelated code.\n\nIf the file is engine/*.cpp or engine/*.h, check:\n1. No comments anywhere in the file.\n2. Every exported extern \"C\" function body is wrapped in try/catch(...) so no exception crosses the ABI.\n3. No strlen on inputs; every read is bounded (method 16, path 8192, headers 65536, body 65536).\n4. Frequency tables are indexed with unsigned char.\n5. Every offset+length is checked against the region size before access.\n6. No std::regex, no mutable globals, no mutable static locals, no thread_local, no locale-dependent calls (printf %f, isalpha, std::tolower with locale).\n7. The result buffer comes from std::malloc and is released only in FreeInspectionResult via std::free; FreeInspectionResult(nullptr) is a no-op.\n8. Output JSON never copies input bytes.\nThen run `make engine` (and `make engine-test` if the target exists) and report warnings or sanitizer findings.\n\nIf the file is proxy/bridge.go, check:\n1. Every C.CString is followed by defer C.free(unsafe.Pointer(...)).\n2. A nil result is checked before use, and defer C.FreeInspectionResult(res) runs exactly once afterwards; the result is never passed to C.free.\n3. The result is copied with C.GoString before the free, and no C pointer escapes the function.\n4. No Go pointer is passed to C. NUL bytes are replaced with 0x20 and inputs are truncated to engine bounds.\n5. It is the only file importing \"C\".\n\nIf the file is any other proxy/*.go file, check:\n1. Hot path, pipeline, and hub hand-offs use non-blocking select with default and increment a drop counter.\n2. Every channel has an explicit capacity; there is no per-request goroutine spawning outside fixed pools.\n3. Shared state is guarded by a mutex or atomic and has a single owner; the Hub goroutine alone mutates its clients map.\n4. Every goroutine exits on context cancellation.\n5. AI_API_KEY never reaches logs, errors, telemetry, or WS messages; prompts are always built from redacted data.\n6. Request and response bodies are never modified; capture limits (64 KiB response, 16 KiB request, 64 KiB decompressed) are honored.\nThen run `go vet ./...` in proxy/ and report findings.\n\nIf no issues are found, reply with one line: \"CGO safety check passed for <file>\"."
+      }
+    }
+  ]
+}
