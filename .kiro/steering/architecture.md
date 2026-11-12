@@ -5,7 +5,7 @@ NetChimera is a real-time HTTP security analysis proxy for the Kiroween Hackatho
 ## Pipeline
 
 ```
-client → :8080 Proxy hot path → upstream (target-lab :9090)
+client → :8080 Proxy hot path → upstream (target-lab :9190)
               │ capped copy, non-blocking send
               ▼
         jobs chan (4096) → worker pool → Bridge (CGO) → C++ Engine
@@ -32,7 +32,7 @@ client → :8080 Proxy hot path → upstream (target-lab :9090)
 
 ## Ports
 
-`8080` proxy, `8081` hub/API (`/ws`, `/api/simulate`, `/api/status`, `/healthz`), `9090` target-lab, `3000` UI. All bind `127.0.0.1` by default.
+`8080` proxy, `8081` hub/API (`/ws`, `/api/simulate`, `/api/status`, `/healthz`), `9190` target-lab, `3000` UI. All bind `127.0.0.1` by default.
 
 ## Conventions
 

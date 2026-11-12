@@ -31,57 +31,57 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
 - [x] 3. Checkpoint: engine
   - Run `make engine` (and `make engine-test` if 2.9 was done). Confirm zero warnings, zero sanitizer reports, and the expected flags on golden vectors. Ask the user if anything is unclear before continuing.
 
-- [ ] 4. Go module, configuration, and CGO bridge
-  - [ ] 4.1 Initialize `proxy/go.mod` (`module netchimera/proxy`, `go 1.25`, `github.com/gorilla/websocket`), and add a root `go.work` including `proxy` and `target-lab`
+- [x] 4. Go module, configuration, and CGO bridge
+  - [x] 4.1 Initialize `proxy/go.mod` (`module netchimera/proxy`, `go 1.25`, `github.com/gorilla/websocket`), and add a root `go.work` including `proxy` (task 9.1 adds `target-lab` once its module exists)
     - _Requirements: 21.1_
-  - [ ] 4.2 Implement `proxy/config.go`: parse and validate every environment variable from the design with defaults; fail fast with clear messages; compute AI mode (`live` vs `mock`); never print `AI_API_KEY`
+  - [x] 4.2 Implement `proxy/config.go`: parse and validate every environment variable from the design with defaults; fail fast with clear messages; compute AI mode (`live` vs `mock`); never print `AI_API_KEY`
     - _Requirements: 8.1, 8.2, 8.3, 9.1, 10.3, 11.1, 11.2, 12.1, 12.2, 12.5_
-  - [ ] 4.3 Implement `proxy/bridge.go`: cgo preamble with per-OS LDFLAGS, `Finding` / `InspectionResult` types, `Inspect` (NUL→space, bound truncation, `C.CString` + deferred `C.free`, nil check, deferred `FreeInspectionResult`, `C.GoString`, unmarshal, `error` field check), `Entropy`, `EngineVersion`, atomic counters, and `EngineStats`
+  - [x] 4.3 Implement `proxy/bridge.go`: cgo preamble with per-OS LDFLAGS, `Finding` / `InspectionResult` types, `Inspect` (NUL→space, bound truncation, `C.CString` + deferred `C.free`, nil check, deferred `FreeInspectionResult`, `C.GoString`, unmarshal, `error` field check), `Entropy`, `EngineVersion`, atomic counters, and `EngineStats`
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
-  - [ ] 4.4 Implement `BuildHeaderBlock(reqHeaders, respHeaders, status)` with deterministic sorted ordering and the `> ` / `< ` / `< :status:` format
+  - [x] 4.4 Implement `BuildHeaderBlock(reqHeaders, respHeaders, status)` with deterministic sorted ordering and the `> ` / `< ` / `< :status:` format
     - _Requirements: 2.2, 7.4_
   - [ ]* 4.5 Write `bridge_test.go`: round-trip against lab-style fixtures, NUL injection case, error path, 10k-call loop under `GODEBUG=cgocheck=1`, and concurrent calls from 8 goroutines
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 5. WebSocket hub and API server
-  - [ ] 5.1 Implement `proxy/ws.go`: envelope type and constructors for all six message types, `Hub` goroutine with register/unregister/broadcast (cap 1024, non-blocking `Publish`), per-client `send` cap 256 with slow-consumer eviction, read/write pumps (4 KiB read limit, 30 s ping, 60 s pong deadline), and an origin check against `UI_ORIGINS`
+- [x] 5. WebSocket hub and API server
+  - [x] 5.1 Implement `proxy/ws.go`: envelope type and constructors for all six message types, `Hub` goroutine with register/unregister/broadcast (cap 1024, non-blocking `Publish`), per-client `send` cap 256 with slow-consumer eviction, read/write pumps (4 KiB read limit, 30 s ping, 60 s pong deadline), and an origin check against `UI_ORIGINS`
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.7_
-  - [ ] 5.2 Add the 200-entry ring buffer of `TRANSACTION_EVENT` and `AI_PATCH_EVENT` with replay on connect, and the 1 s `SYSTEM_STATUS` ticker reading engine, pool, AI, and hub counters
+  - [x] 5.2 Add the 200-entry ring buffer of `TRANSACTION_EVENT` and `AI_PATCH_EVENT` with replay on connect, and the 1 s `SYSTEM_STATUS` ticker reading engine, pool, AI, and hub counters
     - _Requirements: 11.5, 11.6_
-  - [ ] 5.3 Handle inbound `SET_THRESHOLD`: validate range and type, store atomically, broadcast `CONFIG_UPDATED`, publish a telemetry warning on invalid input
+  - [x] 5.3 Handle inbound `SET_THRESHOLD`: validate range and type, store atomically, broadcast `CONFIG_UPDATED`, publish a telemetry warning on invalid input
     - _Requirements: 10.3, 10.5_
-  - [ ] 5.4 Build the API mux on `API_ADDR`: `/ws`, `/api/status` (GET JSON of the current status), `/healthz`, and the CORS middleware for `/api/*` restricted to `UI_ORIGINS`
+  - [x] 5.4 Build the API mux on `API_ADDR`: `/ws`, `/api/status` (GET JSON of the current status), `/healthz`, and the CORS middleware for `/api/*` restricted to `UI_ORIGINS`
     - _Requirements: 11.1, 19.4_
   - [ ]* 5.5 Write `ws_test.go`: origin rejection, slow consumer eviction without blocking others, ring replay order, threshold validation
     - _Requirements: 11.2, 11.4, 11.5, 10.3_
 
-- [ ] 6. Redaction, pipeline, and gatekeeper
-  - [ ] 6.1 Implement `proxy/redact.go`: Finding-span and credential-header redaction applied in descending offset order, Authorization scheme preserved
+- [x] 6. Redaction, pipeline, and gatekeeper
+  - [x] 6.1 Implement `proxy/redact.go`: Finding-span and credential-header redaction applied in descending offset order, Authorization scheme preserved
     - _Requirements: 11.8, 14.1_
-  - [ ] 6.2 Implement `proxy/pipeline.go`: `Transaction` type, bounded `jobs` channel, non-blocking `Submit` with drop counter, `INSPECT_WORKERS` workers, gzip/deflate decode with a 64 KiB `LimitReader`, `body_inspected` handling, bridge call, `TRANSACTION_EVENT` + `ENGINE_TELEMETRY` publishing with optional redaction and 2 KiB base64 body preview, and pooled-buffer return
+  - [x] 6.2 Implement `proxy/pipeline.go`: `Transaction` type, bounded `jobs` channel, non-blocking `Submit` with drop counter, `INSPECT_WORKERS` workers, gzip/deflate decode with a 64 KiB `LimitReader`, `body_inspected` handling, bridge call, `TRANSACTION_EVENT` + `ENGINE_TELEMETRY` publishing with optional redaction and 2 KiB base64 body preview, and pooled-buffer return
     - _Requirements: 8.6, 9.1, 9.2, 9.3, 9.4, 11.8_
-  - [ ] 6.3 Implement the Gatekeeper: atomic threshold, the gate rule, classification priority table (including Go-side session-fixation correlation), path normalization, dedupe map with TTL sweeper, non-blocking `aiQueue` send with drop counter and telemetry, and `ai_status` on the event
+  - [x] 6.3 Implement the Gatekeeper: atomic threshold, the gate rule, classification priority table (including Go-side session-fixation correlation), path normalization, dedupe map with TTL sweeper, non-blocking `aiQueue` send with drop counter and telemetry, and `ai_status` on the event
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
   - [ ]* 6.4 Write `pipeline_test.go`: gate truth table, classification priority, path normalization, dedupe TTL, redaction completeness (property 12), zip bomb bound
     - _Requirements: 10.1, 10.4, 14.1, 9.2_
 
-- [ ] 7. Proxy hot path and process wiring
-  - [ ] 7.1 Implement `captureBody` in `proxy/proxy.go` (limit, truncation flag, single `onClose` via `sync.Once`, `sync.Pool` buffers)
+- [x] 7. Proxy hot path and process wiring
+  - [x] 7.1 Implement `captureBody` in `proxy/proxy.go` (limit, truncation flag, single `onClose` via `sync.Once`, `sync.Pool` buffers)
     - _Requirements: 8.5_
-  - [ ] 7.2 Implement the router and `httputil.ReverseProxy` (`Rewrite` for reverse and allowlisted forward modes, `CONNECT` → 405, non-allowlisted → 403, self-loop refusal), `txState` in the request context, `ModifyResponse` capture and submit, and an `ErrorHandler` that returns 502 and submits a 502 Transaction
+  - [x] 7.2 Implement the router and `httputil.ReverseProxy` (`Rewrite` for reverse and allowlisted forward modes, `CONNECT` → 405, non-allowlisted → 403, self-loop refusal), `txState` in the request context, `ModifyResponse` capture and submit, and an `ErrorHandler` that returns 502 and submits a 502 Transaction
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.8, 8.9_
-  - [ ] 7.3 Implement `proxy/main.go`: load config, probe `EngineVersion`, construct Hub, Pipeline, Agent (stub consumer until task 8), and Simulator (stub until task 10); start both servers with `ReadHeaderTimeout`; graceful shutdown on SIGINT/SIGTERM with a 5 s drain and WS close code 1001
+  - [x] 7.3 Implement `proxy/main.go`: load config, probe `EngineVersion`, construct Hub, Pipeline, Agent (placeholder consumer until task 10), and Simulator (stub until task 10); start both servers with `ReadHeaderTimeout`; graceful shutdown on SIGINT/SIGTERM with a 5 s drain and WS close code 1001
     - _Requirements: 8.1, 9.5, 11.1_
-  - [ ] 7.4 Fill in the Makefile `proxy` target (`CGO_ENABLED=1 go build -o proxy/netchimera ./proxy` after `engine`)
+  - [x] 7.4 Fill in the Makefile `proxy` target (`CGO_ENABLED=1 go build -o proxy/netchimera ./proxy` after `engine`)
     - _Requirements: 21.1_
   - [ ]* 7.5 Write `proxy_test.go`: streaming passthrough, body unmodified, capture limit, forward allowlist, CONNECT 405, 502 path, non-blocking behavior with a full queue (property 11)
     - _Requirements: 8.3, 8.4, 8.5, 8.6, 8.8, 8.9_
 
-- [ ] 8. Checkpoint: engine + bridge + proxy
+- [x] 8. Checkpoint: engine + bridge + proxy
   - Run the proxy against a throwaway upstream (or the lab, once task 9 exists), connect with `websocat ws://127.0.0.1:8081/ws -H 'Origin: http://localhost:3000'`, send a few `curl -x` and reverse requests, and confirm `TRANSACTION_EVENT`, `ENGINE_TELEMETRY`, and `SYSTEM_STATUS` messages. Run `go test ./...` if test tasks were done.
 
 - [ ] 9. Target lab
-  - [ ] 9.1 Initialize `target-lab/go.mod` (stdlib only) and implement `target-lab/main.go` with every route and handler name from the design table, startup secret generation (`crypto/rand`, base62), `AKIAIOSFODNN7EXAMPLE`, a localhost default bind, and the red vulnerability banner
+  - [ ] 9.1 Initialize `target-lab/go.mod` (stdlib only), add it to `go.work`, and implement `target-lab/main.go` with every route and handler name from the design table, startup secret generation (`crypto/rand`, base62), `AKIAIOSFODNN7EXAMPLE`, a localhost default bind, and the red vulnerability banner
     - _Requirements: 20.1, 20.2, 20.3, 20.4, 20.5, 20.6, 20.7_
   - [ ] 9.2 Fill in the Makefile `lab` target
     - _Requirements: 21.1_
@@ -132,7 +132,7 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
 - [ ] 15. Build, containers, and run workflows
   - [ ] 15.1 Write `proxy.Dockerfile` (`golang:1.25-bookworm` with `g++`, build engine + proxy, runtime `debian:bookworm-slim` with `libstdc++6` and `ca-certificates`, non-root user), `target-lab.Dockerfile`, and `ui/Dockerfile` (Node LTS, standalone output, non-root)
     - _Requirements: 21.3, 21.6_
-  - [ ] 15.2 Write `docker-compose.yml`: `target-lab`, `proxy` (`UPSTREAM_URL=http://target-lab:9090`, binds `0.0.0.0` inside the container, `env_file: .env` optional), and `ui`; all ports published on `127.0.0.1`; health checks and `depends_on`
+  - [ ] 15.2 Write `docker-compose.yml`: `target-lab`, `proxy` (`UPSTREAM_URL=http://target-lab:9190`, binds `0.0.0.0` inside the container, `env_file: .env` optional), and `ui`; all ports published on `127.0.0.1`; health checks and `depends_on`
     - _Requirements: 21.3, 21.5_
   - [ ] 15.3 Complete the Makefile `build`, `dev` (parallel lab + proxy + UI with clean Ctrl-C teardown), `test`, `up`, `down`, and `clean` targets
     - _Requirements: 21.1, 21.2, 21.4_

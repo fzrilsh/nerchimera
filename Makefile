@@ -35,9 +35,11 @@ else
 ENGINE_ASAN_OPTIONS := halt_on_error=1:detect_leaks=1
 endif
 
+PROXY_BIN := proxy/netchimera
+
 todo = @echo "make $@: not implemented yet (see .kiro/specs/netchimera/tasks.md, $(1))" >&2; exit 1
 
-.PHONY: all engine engine-shared engine-test proxy lab ui build dev test \
+.PHONY: all engine engine-shared engine-test proxy proxy-test lab ui build dev test \
         simulate bench e2e up down clean
 
 all: build
@@ -66,8 +68,12 @@ $(ENGINE_TEST_BIN): $(ENGINE_SRC) $(ENGINE_HDR) $(ENGINE_TEST_SRC) | $(ENGINE_BU
 	$(CXX) -std=c++17 -O1 -g $(ENGINE_WARN) $(ENGINE_SANITIZE) -pthread -I$(ENGINE_DIR) \
 		$(ENGINE_SRC) $(ENGINE_TEST_SRC) -o $@
 
-proxy:
-	$(call todo,task 7.4)
+proxy: $(ENGINE_LIB)
+	cd proxy && CGO_ENABLED=1 CGO_CFLAGS="-O2 -g -DNETCHIMERA_ENGINE_STAMP=$$(cksum < ../$(ENGINE_LIB) | cut -d' ' -f1)" \
+		go build -trimpath -o netchimera .
+
+proxy-test: $(ENGINE_LIB)
+	cd proxy && CGO_ENABLED=1 GODEBUG=cgocheck=1 go vet ./... && CGO_ENABLED=1 GODEBUG=cgocheck=1 go test -race ./...
 
 lab:
 	$(call todo,task 9.2)
@@ -100,4 +106,4 @@ down:
 	$(call todo,task 15.3)
 
 clean:
-	rm -rf $(ENGINE_BUILD)
+	rm -rf $(ENGINE_BUILD) $(PROXY_BIN)

@@ -130,7 +130,7 @@ The project targets the Kiroween Hackathon, Frankenstein category. It must run f
 #### Acceptance Criteria
 
 1. THE Proxy SHALL listen on `PROXY_ADDR`, default `127.0.0.1:8080`.
-2. WHEN a request uses origin-form (`GET /path`), THE Proxy SHALL forward it to `UPSTREAM_URL`, default `http://127.0.0.1:9090` (reverse mode).
+2. WHEN a request uses origin-form (`GET /path`), THE Proxy SHALL forward it to `UPSTREAM_URL`, default `http://127.0.0.1:9190` (reverse mode).
 3. WHEN a request uses absolute-form (`GET http://host/path`), THE Proxy SHALL forward it only if the host is listed in `FORWARD_ALLOWED_HOSTS` (default `localhost,127.0.0.1,target-lab`); otherwise THE Proxy SHALL respond `403`.
 4. WHEN a request uses the `CONNECT` method, THE Proxy SHALL respond `405`, because TLS interception is out of scope.
 5. THE Proxy SHALL stream response bodies to the client without buffering the full body, while capturing a copy of at most 65536 bytes of the response body and at most 16384 bytes of the request body.
@@ -277,7 +277,7 @@ The project targets the Kiroween Hackathon, Frankenstein category. It must run f
 
 #### Acceptance Criteria
 
-1. THE Target Lab SHALL be a Go standard-library-only server listening on `TARGET_ADDR`, default `127.0.0.1:9090`.
+1. THE Target Lab SHALL be a Go standard-library-only server listening on `TARGET_ADDR`, default `127.0.0.1:9190`.
 2. THE Target Lab SHALL expose `/account/<anything>.css`, which serves private account JSON with `Cache-Control: public, max-age=3600` and a `Set-Cookie` session header (Web Cache Deception).
 3. THE Target Lab SHALL expose `/api/config`, which returns JSON containing a JWT, an AWS-format access key, an `sk-` style key, and a database URI with an embedded password (secret leak).
 4. THE Target Lab SHALL expose `/login`, which accepts a `session` query parameter and sets it as the session cookie without `HttpOnly`, `Secure`, or `SameSite`, and returns a Bearer token in the body (session fixation and insecure cookie).
@@ -293,7 +293,7 @@ The project targets the Kiroween Hackathon, Frankenstein category. It must run f
 
 1. THE repository SHALL provide `make build`, which builds the Engine static library, the Proxy, the Target Lab, and the UI, in that order.
 2. THE repository SHALL provide `make dev`, which runs the Target Lab, Proxy, and UI locally.
-3. THE repository SHALL provide `docker compose up --build`, which runs all three services and publishes ports `8080`, `8081`, `9090`, and `3000` on `127.0.0.1` only.
+3. THE repository SHALL provide `docker compose up --build`, which runs all three services and publishes ports `8080`, `8081`, `9190`, and `3000` on `127.0.0.1` only.
 4. THE repository SHALL provide `make test`, which runs the Engine sanitizer harness and `go test ./...` for the Proxy.
 5. WHEN no environment variables are set, THE System SHALL start with the Mock Generator and complete the full pipeline offline.
 6. THE build SHALL work on macOS (Apple clang, libc++) and Linux (gcc, libstdc++).

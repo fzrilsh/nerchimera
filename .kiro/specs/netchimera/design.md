@@ -26,7 +26,7 @@ Design principles:
 |---|---|---|
 | 8080 | Proxy listener (`PROXY_ADDR`) | `127.0.0.1:8080` |
 | 8081 | Hub + API (`API_ADDR`): `/ws`, `/api/simulate`, `/api/status`, `/healthz` | `127.0.0.1:8081` |
-| 9090 | Target Lab (`TARGET_ADDR`) | `127.0.0.1:9090` |
+| 9190 | Target Lab (`TARGET_ADDR`) | `127.0.0.1:9190` |
 | 3000 | UI (Next.js) | `127.0.0.1:3000` |
 
 Inside Docker, the services bind `0.0.0.0` and Compose publishes them on `127.0.0.1` only.
@@ -53,7 +53,7 @@ flowchart LR
         SIM[Simulator<br/>simulate.go] -->|scenarios via :8080| HP
     end
 
-    UP[Upstream<br/>target-lab :9090] -->|response| HP
+    UP[Upstream<br/>target-lab :9190] -->|response| HP
     HUB <-->|ws :8081/ws| UI[Next.js UI :3000]
     UI -->|POST /api/simulate| SIM
 ```
@@ -363,6 +363,8 @@ func EngineStats() (calls, errors uint64, meanMicros float64)
 
 `Inspect` sanitizes (NUL→space, truncate to engine bounds), allocates the C strings with deferred frees, times the call, checks for nil, defers `FreeInspectionResult`, copies with `C.GoString`, and unmarshals. Counters are `atomic.Uint64`.
 
+**Build cache.** Go's build cache does not hash external libraries passed through `-L`, so a rebuilt `libinspector.a` would not by itself trigger a relink. `make proxy` passes `CGO_CFLAGS=-DNETCHIMERA_ENGINE_STAMP=<cksum of libinspector.a>`, which is part of the cache key, so every engine change produces a fresh binary.
+
 ### 3. Proxy Hot Path (`proxy.go`)
 
 - `http.Server{Addr: PROXY_ADDR, Handler: router, ReadHeaderTimeout: 10s, IdleTimeout: 120s}`. There is no `WriteTimeout`, so long streams are not cut off.
@@ -374,7 +376,7 @@ func EngineStats() (calls, errors uint64, meanMicros float64)
   - Reverse: `pr.SetURL(upstream)`, `pr.SetXForwarded()`.
   - Forward: `pr.Out.URL` is kept as-is and `pr.SetXForwarded()` is applied.
   - Both: clone `pr.In.Header`, wrap `pr.Out.Body` in `captureBody(16 KiB)`, store a `*txState` in the request context (start time, id, method, host, path, cloned req headers, req capture).
-- `ModifyResponse`: clone `resp.Header`, record status and upstream latency, and replace `resp.Body` with `captureBody(64 KiB)` whose `onClose` builds the `Transaction` and calls `pipeline.Submit(tx)`.
+- `ModifyResponse`: clone `resp.Header`, record status and upstream latency, and replace `resp.Body` with `captureBody(64 KiB)` whose `onClose` builds the `Transaction` and calls `pipeline.Submit(tx)`. `101 Switching Protocols` responses are not wrapped, because `ReverseProxy` needs the raw `io.ReadWriteCloser` to tunnel upgrades; they are submitted immediately without a body.
 - `ErrorHandler`: writes `502` and submits a `Transaction` with status 502 and no body.
 
 ```go
@@ -464,9 +466,11 @@ The AI Agent always redacts (Requirement 14.1). Hub events redact only when `RED
 - Library: `github.com/gorilla/websocket`. `Upgrader.CheckOrigin` does an exact match against `UI_ORIGINS`.
 - `Hub` goroutine owns `clients map[*client]struct{}`, handles `register`/`unregister` channels and a `broadcast chan []byte` (cap 1024). `Publish(msg)` marshals once and does a non-blocking send to `broadcast`. If that is full, it increments `hubDropped`.
 - Each client has `send chan []byte` (cap 256), a `writePump` (ping every 30 s, write deadline 10 s), and a `readPump` (`SetReadLimit(4096)`, pong deadline 60 s, handles `SET_THRESHOLD`).
-- Slow consumer: if `client.send` is full during fan-out, the Hub closes and unregisters that client.
-- `ring`: fixed `[200][]byte` with a head index under a mutex, storing `TRANSACTION_EVENT` and `AI_PATCH_EVENT` only. It is replayed into `send` on register.
-- A `status` ticker publishes `SYSTEM_STATUS` every second.
+- Slow consumer: if `client.send` is full during fan-out, the Hub closes and unregisters that client (close code 1008).
+- `ring`: fixed `[200][]byte` with a head index, storing `TRANSACTION_EVENT` and `AI_PATCH_EVENT` only. It is owned by the Hub goroutine (no lock) and replayed into `send` on register.
+- At most 32 WebSocket clients are accepted; further upgrades get `503`. This bounds the two goroutines (read and write pump) per connection.
+- A `status` ticker inside the Hub goroutine publishes `SYSTEM_STATUS` every second.
+- `/api/*` requests that carry an `Origin` outside `UI_ORIGINS` are rejected with `403` before reaching the handler, so cross-site "simple" POSTs cannot trigger side effects. Requests without `Origin` (curl, scripts) are allowed.
 
 #### Envelope and Message Types
 
@@ -513,7 +517,7 @@ interface ConfigUpdated { threshold: number; }
 interface SetThreshold { type: "SET_THRESHOLD"; value: number; }
 ```
 
-Engine status is `online` when the error rate over the last 1000 calls is below 1%, `degraded` above that, and `offline` if the version probe failed at startup (the Proxy still serves traffic).
+Engine status is `online` when the error rate since the previous status sample (one per second) is below 1%, `degraded` above that, and `offline` if the startup probe (`NetChimeraEngineVersion` plus an `Entropy("ab") == 1` self-test) failed. The Proxy still serves traffic when the engine is offline.
 
 ### 7. AI Agent (`agent.go`, `mock.go`)
 
@@ -596,7 +600,7 @@ Defined above as Go structs (`Transaction`, `InspectionResult`, `Finding`, `AIJo
 |---|---|---|
 | `PROXY_ADDR` | `127.0.0.1:8080` | proxy |
 | `API_ADDR` | `127.0.0.1:8081` | proxy (hub/API) |
-| `UPSTREAM_URL` | `http://127.0.0.1:9090` | proxy |
+| `UPSTREAM_URL` | `http://127.0.0.1:9190` | proxy |
 | `FORWARD_ALLOWED_HOSTS` | `localhost,127.0.0.1,target-lab` | proxy |
 | `UI_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | proxy |
 | `INSPECT_WORKERS` | `runtime.NumCPU()` | proxy |
@@ -611,7 +615,7 @@ Defined above as Go structs (`Transaction`, `InspectionResult`, `Finding`, `AIJo
 | `AI_WORKERS` | `2` | agent |
 | `AI_QUEUE_SIZE` | `64` | agent |
 | `AI_DEDUPE_TTL` | `120s` | gatekeeper |
-| `TARGET_ADDR` | `127.0.0.1:9090` | target-lab |
+| `TARGET_ADDR` | `127.0.0.1:9190` | target-lab |
 | `NEXT_PUBLIC_WS_URL` | `ws://localhost:8081/ws` | ui |
 | `NEXT_PUBLIC_API_URL` | `http://localhost:8081` | ui |
 
