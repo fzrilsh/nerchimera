@@ -139,8 +139,8 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
   - [x]* 15.4 Add `make bench` (direct vs proxied p50/p99 latency report against the 1 ms budget) and `make e2e` (lab + proxy + simulate + WS assertions)
     - _Requirements: 8.7_
 
-- [ ] 16. Final verification and documentation
-  - [ ] 16.1 From a clean checkout with no env vars: run `make build`, `make dev`, open `http://localhost:3000`, click "Simulate Attack Traffic", and confirm rows, hex dump, telemetry, and mock advisories with a working "Copy Patch"; repeat with `docker compose up --build`
+- [x] 16. Final verification and documentation
+  - [x] 16.1 From a clean checkout with no env vars: run `make build`, `make dev`, open `http://localhost:3000`, click "Simulate Attack Traffic", and confirm rows, hex dump, telemetry, and mock advisories with a working "Copy Patch"; repeat with `docker compose up --build`
     - _Requirements: 21.1, 21.2, 21.3, 21.5_
-  - [ ] 16.2 Complete `README.md`: architecture diagram, quick start, provider setup (OpenAI / Ollama / DeepSeek), demo script for judges, security notes about the lab, and how Kiro specs, steering, and hooks were used
+  - [x] 16.2 Complete `README.md`: architecture diagram, quick start, provider setup (OpenAI / Ollama / DeepSeek), demo script for judges, security notes about the lab, and how Kiro specs, steering, and hooks were used
     - _Requirements: 20.7, 21.5_
