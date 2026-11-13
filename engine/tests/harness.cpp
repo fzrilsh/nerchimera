@@ -277,7 +277,7 @@ void test_secrets(Tally& t) {
     t.check(field(r, "anomaly_score") > 0.9, "secrets: /api/config scores above 0.9");
     t.check(count_finding(r, "JWT") == 1, "secrets: JWT detected once");
     t.check(has_finding(r, "AWS_ACCESS_KEY"), "secrets: AWS access key detected");
-    t.check(count_finding(r, "API_KEY_SK") == 2, "secrets: sk- and sk_live_ keys detected");
+    t.check(count_finding(r, "API_KEY_SK") == 2, "secrets: two sk- style keys detected");
     t.check(has_finding(r, "DB_CREDENTIAL_URI"), "secrets: database URI with password detected");
     t.check(has_finding(r, "GITHUB_TOKEN"), "secrets: GitHub token detected");
     t.check(has_finding(r, "SLACK_TOKEN"), "secrets: Slack token detected");
