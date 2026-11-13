@@ -40,7 +40,7 @@ LAB_BIN   := target-lab/target-lab
 
 todo = @echo "make $@: not implemented yet (see .kiro/specs/netchimera/tasks.md, $(1))" >&2; exit 1
 
-.PHONY: all engine engine-shared engine-test proxy proxy-test lab ui build dev test \
+.PHONY: all engine engine-shared engine-test proxy proxy-test lab ui ui-install build dev test \
         simulate bench e2e up down clean
 
 all: build
@@ -82,7 +82,10 @@ $(LAB_BIN): $(wildcard target-lab/*.go) target-lab/go.mod
 	cd target-lab && go build -trimpath -o target-lab .
 
 ui:
-	$(call todo,task 14.5)
+	cd ui && npm run build
+
+ui-install:
+	cd ui && npm ci
 
 build:
 	$(call todo,task 15.3)

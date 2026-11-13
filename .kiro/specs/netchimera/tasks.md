@@ -109,24 +109,24 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
 - [x] 12. Checkpoint: backend complete
   - With `make lab` and `make proxy` running and no env vars set, run `make simulate` and confirm via `websocat` that `AI_PATCH_STREAM` and `AI_PATCH_EVENT` (mock source) arrive for the WCD, credential leak, and session fixation scenarios, and that the controls produce no advisories.
 
-- [ ] 13. UI foundation
-  - [ ] 13.1 Scaffold `ui/` with Next.js 14 App Router + TypeScript + Tailwind 3; add `lucide-react`, `@xterm/xterm`, `@xterm/addon-fit`; set `output: "standalone"`; configure the theme palette, fonts, scanline overlay, and neon utilities in `tailwind.config.ts` and `globals.css`
+- [x] 13. UI foundation
+  - [x] 13.1 Scaffold `ui/` with Next.js 14 App Router + TypeScript + Tailwind 3; add `lucide-react`, `@xterm/xterm`, `@xterm/addon-fit`; set `output: "standalone"`; configure the theme palette, fonts, scanline overlay, and neon utilities in `tailwind.config.ts` and `globals.css`
     - _Requirements: 15.1, 15.2_
-  - [ ] 13.2 Implement `ui/lib/types.ts` mirroring the wire protocol, `ui/lib/sanitize.ts` (`stripControls`), and `ui/lib/hexdump.ts`
+  - [x] 13.2 Implement `ui/lib/types.ts` mirroring the wire protocol, `ui/lib/sanitize.ts` (`stripControls`), and `ui/lib/hexdump.ts`
     - _Requirements: 17.1, 17.4_
-  - [ ] 13.3 Implement `ui/lib/ws.ts` (backoff with jitter, typed dispatch, `send`) and `ui/lib/store.ts` (`useSyncExternalStore`, rAF batching, 500-row and 100-advisory caps, streaming map)
+  - [x] 13.3 Implement `ui/lib/ws.ts` (backoff with jitter, typed dispatch, `send`) and `ui/lib/store.ts` (`useSyncExternalStore`, rAF batching, 500-row and 100-advisory caps, streaming map)
     - _Requirements: 15.6, 16.3_
 
-- [ ] 14. UI panes
-  - [ ] 14.1 Implement `TopBar` with the Engine / Pool / AI / WS status pills, threshold slider with `SET_THRESHOLD` on release and `CONFIG_UPDATED` confirmation, and `SimulateButton` (POST, cooldown, 429 handling)
+- [x] 14. UI panes
+  - [x] 14.1 Implement `TopBar` with the Engine / Pool / AI / WS status pills, threshold slider with `SET_THRESHOLD` on release and `CONFIG_UPDATED` confirmation, and `SimulateButton` (POST, cooldown, 429 handling)
     - _Requirements: 15.3, 15.4, 19.1_
-  - [ ] 14.2 Implement `PacketStream` with `EntropyBar` (0–8 scale, 4.3 marker) and `AnomalyBadge` (green / amber / crimson rules), plus row selection
+  - [x] 14.2 Implement `PacketStream` with `EntropyBar` (0–8 scale, 4.3 marker) and `AnomalyBadge` (green / amber / crimson rules), plus row selection
     - _Requirements: 16.1, 16.2, 16.3, 16.4_
-  - [ ] 14.3 Implement `Inspector` (client-only dynamic import, `FitAddon`, `ResizeObserver`, dispose on unmount): hex dump of the selected Transaction and color-coded telemetry, with every payload string passed through `stripControls`
+  - [x] 14.3 Implement `Inspector` (client-only dynamic import, `FitAddon`, `ResizeObserver`, dispose on unmount): hex dump of the selected Transaction and color-coded telemetry, with every payload string passed through `stripControls`
     - _Requirements: 17.1, 17.2, 17.3, 17.4_
-  - [ ] 14.4 Implement `RemediationConsole` and `DiffView`: live streaming text, classification/severity/source chips, root cause, line-colored diff, Nginx and Cloudflare blocks, and "Copy Patch" with a 2 s confirmation; text nodes only
+  - [x] 14.4 Implement `RemediationConsole` and `DiffView`: live streaming text, classification/severity/source chips, root cause, line-colored diff, Nginx and Cloudflare blocks, and "Copy Patch" with a 2 s confirmation; text nodes only
     - _Requirements: 18.1, 18.2, 18.3, 18.4_
-  - [ ] 14.5 Compose `app/page.tsx` into the three-pane layout (side by side at ≥ 1280 px, stacked below) and fill in the Makefile `ui` target
+  - [x] 14.5 Compose `app/page.tsx` into the three-pane layout (side by side at ≥ 1280 px, stacked below) and fill in the Makefile `ui` target
     - _Requirements: 15.5, 21.1_
 
 - [ ] 15. Build, containers, and run workflows
