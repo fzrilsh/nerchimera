@@ -1,5 +1,7 @@
 # NetChimera
 
+![NetChimera — a Frankenstein security proxy stitching Go, C++ and AI](docs/thumbnail.jpeg)
+
 > A real-time HTTP security analysis proxy stitched together from four distinct technologies into one seamless pipeline. Built for the **Kiroween Hackathon — Frankenstein category.**
 
 NetChimera sits in front of an HTTP service, inspects every request/response pair in real time, scores it for anomalies, and — when something looks wrong — has an autonomous LLM agent synthesize a classified security advisory with a **ready-to-apply unified diff**. A retro-futuristic tactical terminal UI shows the whole thing live.
