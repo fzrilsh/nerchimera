@@ -127,7 +127,7 @@ func LoadConfig(getenv func(string) string) (Config, error) {
 	}
 
 	c.UIOrigins = make(map[string]struct{})
-	for _, o := range splitList(env("UI_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")) {
+	for _, o := range splitList(env("UI_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3100,http://127.0.0.1:3100")) {
 		u, err := parseHTTPURL(o)
 		if err != nil || (u.Path != "" && u.Path != "/") || u.RawQuery != "" {
 			fail("UI_ORIGINS", fmt.Errorf("invalid origin %q", o))

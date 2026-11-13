@@ -27,7 +27,7 @@ Design principles:
 | 8080 | Proxy listener (`PROXY_ADDR`) | `127.0.0.1:8080` |
 | 8081 | Hub + API (`API_ADDR`): `/ws`, `/api/simulate`, `/api/status`, `/healthz` | `127.0.0.1:8081` |
 | 9190 | Target Lab (`TARGET_ADDR`) | `127.0.0.1:9190` |
-| 3000 | UI (Next.js) | `127.0.0.1:3000` |
+| 3100 | UI (Next.js) | `127.0.0.1:3100` |
 
 Inside Docker, the services bind `0.0.0.0` and Compose publishes them on `127.0.0.1` only.
 
@@ -54,7 +54,7 @@ flowchart LR
     end
 
     UP[Upstream<br/>target-lab :9190] -->|response| HP
-    HUB <-->|ws :8081/ws| UI[Next.js UI :3000]
+    HUB <-->|ws :8081/ws| UI[Next.js UI :3100]
     UI -->|POST /api/simulate| SIM
 ```
 
@@ -602,7 +602,7 @@ Defined above as Go structs (`Transaction`, `InspectionResult`, `Finding`, `AIJo
 | `API_ADDR` | `127.0.0.1:8081` | proxy (hub/API) |
 | `UPSTREAM_URL` | `http://127.0.0.1:9190` | proxy |
 | `FORWARD_ALLOWED_HOSTS` | `localhost,127.0.0.1,target-lab` | proxy |
-| `UI_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000` | proxy |
+| `UI_ORIGINS` | `http://localhost:3000,http://127.0.0.1:3000,http://localhost:3100,http://127.0.0.1:3100` | proxy |
 | `INSPECT_WORKERS` | `runtime.NumCPU()` | proxy |
 | `INSPECT_QUEUE_SIZE` | `4096` | proxy |
 | `ANOMALY_THRESHOLD` | `0.65` | proxy |

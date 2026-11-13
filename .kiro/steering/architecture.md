@@ -10,7 +10,7 @@ client → :8080 Proxy hot path → upstream (target-lab :9190)
               ▼
         jobs chan (4096) → worker pool → Bridge (CGO) → C++ Engine
                                │
-                               ├─ every tx → Hub :8081/ws → UI :3000
+                               ├─ every tx → Hub :8081/ws → UI :3100
                                └─ Gatekeeper (score > θ or flag) → aiQueue (64) → AI Agent → Hub
 ```
 
@@ -32,7 +32,7 @@ client → :8080 Proxy hot path → upstream (target-lab :9190)
 
 ## Ports
 
-`8080` proxy, `8081` hub/API (`/ws`, `/api/simulate`, `/api/status`, `/healthz`), `9190` target-lab, `3000` UI. All bind `127.0.0.1` by default.
+`8080` proxy, `8081` hub/API (`/ws`, `/api/simulate`, `/api/status`, `/healthz`), `9190` target-lab, `3100` UI. All bind `127.0.0.1` by default.
 
 ## Conventions
 

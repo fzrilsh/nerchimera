@@ -170,7 +170,7 @@ The project targets the Kiroween Hackathon, Frankenstein category. It must run f
 #### Acceptance Criteria
 
 1. THE Hub SHALL serve WebSocket connections at `API_ADDR` (default `127.0.0.1:8081`) on path `/ws`.
-2. THE Hub SHALL reject WebSocket upgrades whose `Origin` is not listed in `UI_ORIGINS` (default `http://localhost:3000,http://127.0.0.1:3000`).
+2. THE Hub SHALL reject WebSocket upgrades whose `Origin` is not listed in `UI_ORIGINS` (default `http://localhost:3000,http://127.0.0.1:3000,http://localhost:3100,http://127.0.0.1:3100`).
 3. THE Hub SHALL send every message as a JSON envelope `{ "type", "ts", "data" }` with `type` one of `TRANSACTION_EVENT`, `ENGINE_TELEMETRY`, `SYSTEM_STATUS`, `AI_PATCH_STREAM`, `AI_PATCH_EVENT`, `CONFIG_UPDATED`.
 4. THE Hub SHALL give each client a send buffer of 256 messages; IF a client's buffer is full, THEN THE Hub SHALL disconnect that client without blocking other clients or the Pipeline.
 5. WHEN a client connects, THE Hub SHALL replay the most recent 200 `TRANSACTION_EVENT` and `AI_PATCH_EVENT` messages from a ring buffer.
@@ -293,7 +293,7 @@ The project targets the Kiroween Hackathon, Frankenstein category. It must run f
 
 1. THE repository SHALL provide `make build`, which builds the Engine static library, the Proxy, the Target Lab, and the UI, in that order.
 2. THE repository SHALL provide `make dev`, which runs the Target Lab, Proxy, and UI locally.
-3. THE repository SHALL provide `docker compose up --build`, which runs all three services and publishes ports `8080`, `8081`, `9190`, and `3000` on `127.0.0.1` only.
+3. THE repository SHALL provide `docker compose up --build`, which runs all three services and publishes ports `8080`, `8081`, `9190`, and `3100` on `127.0.0.1` only.
 4. THE repository SHALL provide `make test`, which runs the Engine sanitizer harness and `go test ./...` for the Proxy.
 5. WHEN no environment variables are set, THE System SHALL start with the Mock Generator and complete the full pipeline offline.
 6. THE build SHALL work on macOS (Apple clang, libc++) and Linux (gcc, libstdc++).

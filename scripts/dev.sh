@@ -34,6 +34,6 @@ echo "netchimera dev stack running:"
 echo "  proxy      http://127.0.0.1:8080"
 echo "  api / ws   http://127.0.0.1:8081  (ws://127.0.0.1:8081/ws)"
 echo "  target-lab http://127.0.0.1:9190"
-echo "  ui         http://localhost:3000"
+echo "  ui         http://localhost:3100"
 echo "press Ctrl-C to stop."
 wait

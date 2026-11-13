@@ -27,7 +27,7 @@ It runs **fully offline with zero configuration**: with no API key, the AI agent
           │           every tx + telemetry ──► WebSocket hub :8081/ws              │   llm / mock
           └──────────────────────────────────────────┬───────────────────────────┘        │
                                                       ▼                                     │
-                                             Next.js UI :3000  ◄──── AI_PATCH_STREAM / EVENT ┘
+                                             Next.js UI :3100  ◄──── AI_PATCH_STREAM / EVENT ┘
 ```
 
 See [`.kiro/specs/netchimera/design.md`](.kiro/specs/netchimera/design.md) for the full design, CGO memory contract, threat model, and message protocol.
@@ -45,7 +45,7 @@ See [`.kiro/specs/netchimera/design.md`](.kiro/specs/netchimera/design.md) for t
 ```sh
 make build        # engine → proxy → target-lab → ui
 make dev          # runs target-lab, proxy and UI together (Ctrl-C stops all)
-# open http://localhost:3000  and click "SIMULATE ATTACK"
+# open http://localhost:3100  and click "SIMULATE ATTACK"
 ```
 
 `make dev` needs the UI dependencies once: `make ui-install`.
@@ -54,7 +54,7 @@ make dev          # runs target-lab, proxy and UI together (Ctrl-C stops all)
 
 ```sh
 make up           # docker compose up --build  (all ports on 127.0.0.1 only)
-# open http://localhost:3000
+# open http://localhost:3100
 make down
 ```
 
@@ -117,7 +117,7 @@ The API key is only ever sent in the outbound `Authorization` header. It is neve
 - **`target-lab/` is intentionally vulnerable.** It binds to `127.0.0.1` and prints a warning banner. Never expose it to a network. Its "secrets" are generated at startup (`crypto/rand`) or are AWS's documented example key; no real credential ships in this repo.
 - Everything binds to `127.0.0.1` by default; Docker publishes only on `127.0.0.1`.
 - The forward proxy only reaches hosts in `FORWARD_ALLOWED_HOSTS`; `CONNECT` is refused. The WebSocket hub and `/api/*` enforce an `Origin` allowlist. Captured traffic is treated as untrusted data in LLM prompts and is control-character-stripped before it touches the terminal; AI output is display-only and never executed.
-- Port `3000` must be free for the UI. If another local process holds it, stop that process or change the UI port.
+- Port `3100` is the default UI port (moved off `3000`, which is commonly occupied). If another local process holds it, change the UI port in `ui/package.json`, `docker-compose.yml`, and `UI_ORIGINS`.
 - The UI's `npm audit` reports advisories against Next.js that are only fixed in Next 16 (a major upgrade) and concern features this static, loopback-only dashboard does not use (image optimization, server actions, middleware rewrites). They are accepted for the demo.
 
 ## How Kiro built this

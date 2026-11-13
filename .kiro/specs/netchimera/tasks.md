@@ -40,7 +40,7 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
   - [x] 4.4 Implement `BuildHeaderBlock(reqHeaders, respHeaders, status)` with deterministic sorted ordering and the `> ` / `< ` / `< :status:` format
     - _Requirements: 2.2, 7.4_
-  - [ ]* 4.5 Write `bridge_test.go`: round-trip against lab-style fixtures, NUL injection case, error path, 10k-call loop under `GODEBUG=cgocheck=1`, and concurrent calls from 8 goroutines
+  - [x]* 4.5 Write `bridge_test.go`: round-trip against lab-style fixtures, NUL injection case, error path, 10k-call loop under `GODEBUG=cgocheck=1`, and concurrent calls from 8 goroutines
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
 - [x] 5. WebSocket hub and API server
@@ -52,7 +52,7 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
     - _Requirements: 10.3, 10.5_
   - [x] 5.4 Build the API mux on `API_ADDR`: `/ws`, `/api/status` (GET JSON of the current status), `/healthz`, and the CORS middleware for `/api/*` restricted to `UI_ORIGINS`
     - _Requirements: 11.1, 19.4_
-  - [ ]* 5.5 Write `ws_test.go`: origin rejection, slow consumer eviction without blocking others, ring replay order, threshold validation
+  - [x]* 5.5 Write `ws_test.go`: origin rejection, slow consumer eviction without blocking others, ring replay order, threshold validation
     - _Requirements: 11.2, 11.4, 11.5, 10.3_
 
 - [x] 6. Redaction, pipeline, and gatekeeper
@@ -62,7 +62,7 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
     - _Requirements: 8.6, 9.1, 9.2, 9.3, 9.4, 11.8_
   - [x] 6.3 Implement the Gatekeeper: atomic threshold, the gate rule, classification priority table (including Go-side session-fixation correlation), path normalization, dedupe map with TTL sweeper, non-blocking `aiQueue` send with drop counter and telemetry, and `ai_status` on the event
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
-  - [ ]* 6.4 Write `pipeline_test.go`: gate truth table, classification priority, path normalization, dedupe TTL, redaction completeness (property 12), zip bomb bound
+  - [x]* 6.4 Write `pipeline_test.go`: gate truth table, classification priority, path normalization, dedupe TTL, redaction completeness (property 12), zip bomb bound
     - _Requirements: 10.1, 10.4, 14.1, 9.2_
 
 - [x] 7. Proxy hot path and process wiring
@@ -74,7 +74,7 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
     - _Requirements: 8.1, 9.5, 11.1_
   - [x] 7.4 Fill in the Makefile `proxy` target (`CGO_ENABLED=1 go build -o proxy/netchimera ./proxy` after `engine`)
     - _Requirements: 21.1_
-  - [ ]* 7.5 Write `proxy_test.go`: streaming passthrough, body unmodified, capture limit, forward allowlist, CONNECT 405, 502 path, non-blocking behavior with a full queue (property 11)
+  - [x]* 7.5 Write `proxy_test.go`: streaming passthrough, body unmodified, capture limit, forward allowlist, CONNECT 405, 502 path, non-blocking behavior with a full queue (property 11)
     - _Requirements: 8.3, 8.4, 8.5, 8.6, 8.8, 8.9_
 
 - [x] 8. Checkpoint: engine + bridge + proxy
@@ -97,7 +97,7 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
     - _Requirements: 12.3, 12.5, 13.2_
   - [x] 10.4 Implement the section parser and diff validation, `Advisory` assembly, `AI_PATCH_EVENT` publishing, mock fallback with `source: "fallback"`, AI status/processed counters, and `AI_WORKERS` consumers of `aiQueue`; replace the stub from 7.3
     - _Requirements: 12.2, 12.4, 13.1, 13.3, 13.4, 14.3_
-  - [ ]* 10.5 Write `agent_test.go`: SSE parser edge cases with an `httptest` fake provider, fallback on 500/timeout, parser on missing sections, mock determinism (property 13), and `git apply --check` of mock diffs against a temp copy of `target-lab/`
+  - [x]* 10.5 Write `agent_test.go`: SSE parser edge cases with an `httptest` fake provider, fallback on 500/timeout, parser on missing sections, mock determinism (property 13), and `git apply --check` of mock diffs against a temp copy of `target-lab/`
     - _Requirements: 12.4, 13.4, 13.5_
 
 - [x] 11. Attack simulator
