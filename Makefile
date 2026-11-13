@@ -38,6 +38,8 @@ endif
 PROXY_BIN := proxy/netchimera
 LAB_BIN   := target-lab/target-lab
 
+COMPOSE := $(shell if docker compose version >/dev/null 2>&1; then echo "docker compose"; else echo "docker-compose"; fi)
+
 todo = @echo "make $@: not implemented yet (see .kiro/specs/netchimera/tasks.md, $(1))" >&2; exit 1
 
 .PHONY: all engine engine-shared engine-test proxy proxy-test lab ui ui-install build dev test \
@@ -87,29 +89,25 @@ ui:
 ui-install:
 	cd ui && npm ci
 
-build:
-	$(call todo,task 15.3)
+build: engine proxy lab ui
 
-dev:
-	$(call todo,task 15.3)
+dev: engine proxy lab
+	@echo "starting target-lab, proxy and ui (Ctrl-C to stop all)"
+	@bash scripts/dev.sh
 
-test:
-	$(call todo,task 15.3)
-
-simulate:
-	@PROXY_URL=$${PROXY_URL:-http://127.0.0.1:8080} ./scripts/simulate.sh
-
-bench:
-	$(call todo,task 15.4)
-
-e2e:
-	$(call todo,task 15.4)
+test: engine-test proxy-test
 
 up:
-	$(call todo,task 15.3)
+	$(COMPOSE) up --build
 
 down:
-	$(call todo,task 15.3)
+	$(COMPOSE) down -v
+
+bench: proxy lab
+	@bash scripts/bench.sh
+
+e2e: proxy lab
+	@bash scripts/e2e.sh
 
 clean:
 	rm -rf $(ENGINE_BUILD) $(PROXY_BIN) $(LAB_BIN)

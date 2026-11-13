@@ -129,14 +129,14 @@ Tasks run in order. Each task builds on the previous ones and ends with the code
   - [x] 14.5 Compose `app/page.tsx` into the three-pane layout (side by side at ≥ 1280 px, stacked below) and fill in the Makefile `ui` target
     - _Requirements: 15.5, 21.1_
 
-- [ ] 15. Build, containers, and run workflows
-  - [ ] 15.1 Write `proxy.Dockerfile` (`golang:1.25-bookworm` with `g++`, build engine + proxy, runtime `debian:bookworm-slim` with `libstdc++6` and `ca-certificates`, non-root user), `target-lab.Dockerfile`, and `ui/Dockerfile` (Node LTS, standalone output, non-root)
+- [x] 15. Build, containers, and run workflows
+  - [x] 15.1 Write `proxy.Dockerfile` (`golang:1.25-bookworm` with `g++`, build engine + proxy, runtime `debian:bookworm-slim` with `libstdc++6` and `ca-certificates`, non-root user), `target-lab.Dockerfile`, and `ui/Dockerfile` (Node LTS, standalone output, non-root)
     - _Requirements: 21.3, 21.6_
-  - [ ] 15.2 Write `docker-compose.yml`: `target-lab`, `proxy` (`UPSTREAM_URL=http://target-lab:9190`, binds `0.0.0.0` inside the container, `env_file: .env` optional), and `ui`; all ports published on `127.0.0.1`; health checks and `depends_on`
+  - [x] 15.2 Write `docker-compose.yml`: `target-lab`, `proxy` (`UPSTREAM_URL=http://target-lab:9190`, binds `0.0.0.0` inside the container, `env_file: .env` optional), and `ui`; all ports published on `127.0.0.1`; health checks and `depends_on`
     - _Requirements: 21.3, 21.5_
-  - [ ] 15.3 Complete the Makefile `build`, `dev` (parallel lab + proxy + UI with clean Ctrl-C teardown), `test`, `up`, `down`, and `clean` targets
+  - [x] 15.3 Complete the Makefile `build`, `dev` (parallel lab + proxy + UI with clean Ctrl-C teardown), `test`, `up`, `down`, and `clean` targets
     - _Requirements: 21.1, 21.2, 21.4_
-  - [ ]* 15.4 Add `make bench` (direct vs proxied p50/p99 latency report against the 1 ms budget) and `make e2e` (lab + proxy + simulate + WS assertions)
+  - [x]* 15.4 Add `make bench` (direct vs proxied p50/p99 latency report against the 1 ms budget) and `make e2e` (lab + proxy + simulate + WS assertions)
     - _Requirements: 8.7_
 
 - [ ] 16. Final verification and documentation

@@ -1,0 +1,11 @@
+**/.git
+**/node_modules
+ui/.next
+ui/out
+engine/build
+proxy/netchimera
+target-lab/target-lab
+**/*.tsbuildinfo
+.env
+.env.*
+!.env.example

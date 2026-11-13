@@ -1,0 +1,55 @@
+# NetChimera full stack. All ports are published on 127.0.0.1 only.
+# Works offline with no configuration (mock AI). To use a live model, create a
+# .env file from .env.example; the proxy reads it via env_file below.
+
+services:
+  target-lab:
+    build:
+      context: .
+      dockerfile: target-lab.Dockerfile
+    environment:
+      TARGET_ADDR: 0.0.0.0:9190
+    ports:
+      - "127.0.0.1:9190:9190"
+    networks: [chimera]
+
+  proxy:
+    build:
+      context: .
+      dockerfile: proxy.Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      PROXY_ADDR: 0.0.0.0:8080
+      API_ADDR: 0.0.0.0:8081
+      UPSTREAM_URL: http://target-lab:9190
+      FORWARD_ALLOWED_HOSTS: localhost,127.0.0.1,target-lab
+      UI_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      target-lab:
+        condition: service_started
+    networks: [chimera]
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+      args:
+        # Baked into the browser bundle at build time; point at the host's
+        # published ports.
+        NEXT_PUBLIC_WS_URL: ws://localhost:8081/ws
+        NEXT_PUBLIC_API_URL: http://localhost:8081
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      proxy:
+        condition: service_healthy
+    networks: [chimera]
+
+networks:
+  chimera:
+    driver: bridge
